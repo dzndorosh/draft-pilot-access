@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Draft · пилотный доступ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" href="ids/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+    <script>
+      (function () {
+        var theme = localStorage.getItem("ids-theme");
+        if (theme === "dark" || (!theme && matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="ids/css/tokens/palette.css">
+    <link rel="stylesheet" href="ids/css/tokens/colors.css">
+    <link rel="stylesheet" href="ids/css/tokens/scales.css">
+    <link rel="stylesheet" href="ids/css/settings.css">
+    <link rel="stylesheet" href="ids/css/reset.css">
+    <link rel="stylesheet" href="ids/css/page-composition/layout.css">
+    <link rel="stylesheet" href="ids/css/components/ids.css">
+    <link rel="stylesheet" href="ids/css/components/navbar.css">
+    <link rel="stylesheet" href="ids/css/components/footnotes.css">
+    <link rel="stylesheet" href="ids/css/components/theme-toggle.css">
+    <style>
+      .card {
+        height: 100%;
+        padding: 1em 1.2em 0.8em;
+        background: var(--ids__surface);
+        --ids__radius: 1em;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 0.1em 0.6em 0.15em;
+        font-size: 0.8em;
+        font-weight: 600;
+        white-space: nowrap;
+        border-radius: var(--ids__radius-pill);
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 12%, transparent);
+      }
+      .tone-open {
+        --tone: var(--ids__success);
+      }
+      .tone-wait {
+        --tone: var(--ids__accent);
+      }
+      .tone-team {
+        --tone: var(--ids__link);
+      }
+      .tone-plain {
+        --tone: var(--ids__text-caption);
+      }
+
+      /* Схема пути: шаги слева направо, на телефоне сверху вниз */
+      .lane {
+        margin-bottom: var(--ids__spacer-m);
+      }
+      .lane-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.6em;
+        margin-bottom: 0.6em;
+      }
+      .ids .lane-head h3 {
+        margin-bottom: 0;
+      }
+      .ids ol.flow {
+        display: flex;
+        gap: 1.4em;
+        margin: 0;
+        padding: 0;
+
+        @media (width < 768px) {
+          flex-direction: column;
+        }
+      }
+      .ids ol.flow li {
+        position: relative;
+        flex: 1 1 0;
+        margin: 0;
+        padding: 0.6em 0.7em 0.7em;
+        list-style: none;
+        font-size: 0.8em;
+        line-height: 1.25;
+        border-radius: var(--ids__radius-m);
+        background: color-mix(in srgb, var(--tone, var(--ids__text)) 8%, transparent);
+        border: var(--ids__border-width-s) solid color-mix(in srgb, var(--tone, var(--ids__text)) 25%, transparent);
+      }
+      .ids ol.flow li:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        top: 50%;
+        right: -1.35em;
+        transform: translateY(-50%);
+        color: var(--ids__text-caption);
+
+        @media (width < 768px) {
+          content: "↓";
+          top: auto;
+          right: auto;
+          bottom: -1.5em;
+          left: 0.7em;
+          transform: none;
+        }
+      }
+      .ids ol.flow.fork li:nth-child(2)::after {
+        content: "или";
+        right: -2.6em;
+        font-size: 0.9em;
+
+        @media (width < 768px) {
+          right: auto;
+        }
+      }
+      .ids ol.flow.fork {
+        gap: 2.6em;
+      }
+      /* Навигация стоит в потоке текста: закреплённая перекрывает широкие схемы */
+      .ids__navbar {
+        position: static;
+        margin: 1em 0;
+      }
+      @media (width < 768px) {
+        .ids__sequence.stack .ids__sequence-item {
+          --columns: 1;
+        }
+      }
+      .flow b {
+        display: block;
+        margin-bottom: 0.2em;
+      }
+      .flow span {
+        color: var(--ids__text-caption);
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em;
+      }
+
+      /* Набросок экрана ожидания */
+      .screen {
+        max-width: 22em;
+        padding: 1.4em 1.4em 1.2em;
+        background: var(--ids__background);
+        border: var(--ids__border-width-s) solid var(--ids__border);
+        --ids__radius: 1.4em;
+      }
+      .ids .screen h4 {
+        font-size: 1.3em;
+      }
+      .screen-field {
+        margin-bottom: 0.5em;
+        padding: 0.5em 0.7em;
+        font-size: 0.9em;
+        color: var(--ids__text-caption);
+        border: var(--ids__border-width-s) solid var(--ids__border);
+        border-radius: var(--ids__radius-m);
+      }
+      .screen-links {
+        display: flex;
+        gap: 0.5em;
+        margin-top: 0.8em;
+      }
+      .screen-links span {
+        flex: 1;
+        padding: 0.5em;
+        text-align: center;
+        font-size: 0.9em;
+        font-weight: 600;
+        border-radius: var(--ids__radius-m);
+        background: var(--ids__surface);
+      }
+
+      .ids table {
+        width: 100%;
+      }
+      .ids blockquote {
+        border-left: var(--ids__border-width-m) solid var(--ids__link);
+      }
+    </style>
+  </head>
+
+  <body class="ids">
+    <header>
+      <button class="ids__theme-toggle" role="switch" aria-checked="false" aria-label="Тёмная тема">
+        <span class="ids__theme-toggle__track"><span class="ids__theme-toggle__thumb"></span></span>
+      </button>
+    </header>
+
+    <main>
+      <!-- Суть -->
+      <div class="ids__wrapper">
+        <div class="ids__space L"></div>
+        <div class="ids__text-width">
+          <ids-nav-item id="intro" label="Суть">
+            <hgroup>
+              <p>Draft · пилот · 16 ноября 2026</p>
+              <h1>Вход, приглашения и лист ожидания</h1>
+            </hgroup>
+          </ids-nav-item>
+          <p class="loud">В продукт попадают только те, кого мы позвали лично. Все остальные регистрируются, оставляют телефон и ждут приглашения.</p>
+          <ids-navbar></ids-navbar>
+          <div class="ids__space M"></div>
+          <p>Так мы держим число пользователей пилота под контролем и при этом видим, рекомендуют ли нас: каждый учитель с доступом получает личную ссылку для коллег, и мы считаем, сколько человек по ней пришло.</p>
+          <aside>
+            <p>Основа уже сделана первой версией: вход по коду из письма, приглашения, ссылки коллег, лист ожидания, одобрение и счётчики. Что осталось добавить, собрано <a href="#todo">в конце страницы</a>.</p>
+          </aside>
+        </div>
+        <div class="ids__space L"></div>
+      </div>
+
+      <!-- Два статуса -->
+      <div class="ids__wrapper">
+        <ids-nav-item id="statuses" label="Два статуса">
+          <h2>У аккаунта два статуса</h2>
+        </ids-nav-item>
+        <div class="ids__sequence XL gap-M">
+          <div class="ids__sequence-item">
+            <div class="card ids__rounded">
+              <p><span class="tag tone-open">В продукте</span></p>
+              <h3>Доступ открыт</h3>
+              <p>Учитель работает с уроками, планами и расписанием. У него есть личная ссылка, которой он зовёт коллег.</p>
+            </div>
+          </div>
+          <div class="ids__sequence-item">
+            <div class="card ids__rounded">
+              <p><span class="tag tone-wait">Лист ожидания</span></p>
+              <h3>Доступ закрыт</h3>
+              <p>Человек зарегистрирован, указал классы и предметы, оставил телефон. Продукт закрыт на сервере, а не только в интерфейсе.</p>
+            </div>
+          </div>
+        </div>
+        <div class="ids__text-width">
+          <p>Перевести человека из листа ожидания в продукт можем только мы, кнопкой одобрения в админке. Вход у всех одинаковый: почта и <ids-footnote-link>шестизначный код из письма</ids-footnote-link>.</p>
+          <ids-footnote><p>Старая регистрация по паролю остаётся. Она тоже ведёт в лист ожидания, поэтому обойти ограничение через неё нельзя. Предложение: убрать её после пилота.</p></ids-footnote>
+        </div>
+        <div class="ids__space L"></div>
+      </div>
+
+      <!-- Пути -->
+      <div class="ids__wrapper L">
+        <ids-nav-item id="paths" label="Пути пользователей">
+          <h2>Как это выглядит для разных людей</h2>
+        </ids-nav-item>
+        <p class="legend">
+          <span class="tag tone-plain">шаг человека</span>
+          <span class="tag tone-team">делаем мы</span>
+          <span class="tag tone-wait">ожидание</span>
+          <span class="tag tone-open">в продукте</span>
+        </p>
+        <div class="ids__space S"></div>
+
+        <div class="lane">
+          <div class="lane-head">
+            <h3>1. Учитель, которого позвали мы</h3>
+            <span class="tag tone-open">сразу в продукт</span>
+          </div>
+          <ol class="flow">
+            <li class="tone-team"><b>Личная ссылка</b><span>Создаём в админке и отправляем человеку сами</span></li>
+            <li><b>Почта и код</b><span>Вводит почту, получает код в письме</span></li>
+            <li><b>Имя и школа</b><span>Школа может быть уже подставлена из приглашения</span></li>
+            <li><b>Классы и предметы</b><span>Настройка под себя, можно прерваться и продолжить</span></li>
+            <li class="tone-open"><b>Первый материал</b><span>Обычная генерация урока</span></li>
+            <li class="tone-open"><b>«Пригласить коллегу»</b><span>Появляется после первого успешного материала</span></li>
+          </ol>
+        </div>
+
+        <div class="lane">
+          <div class="lane-head">
+            <h3>2. Коллега по ссылке учителя</h3>
+            <span class="tag tone-wait">в лист ожидания</span>
+          </div>
+          <ol class="flow">
+            <li><b>Ссылка коллеги</b><span>Записываем, кто привёл</span></li>
+            <li><b>Почта и код</b><span>Тот же вход</span></li>
+            <li><b>Имя, классы, предметы</b><span>Та же настройка</span></li>
+            <li><b>Телефон</b><span>Обязателен. Ник в Telegram по желанию, галочка согласия</span></li>
+            <li class="tone-wait"><b>Экран ожидания</b><span>Обещание письма и ссылки на каналы</span></li>
+            <li class="tone-team"><b>Пишем ему</b><span>Через несколько дней, с вопросом</span></li>
+            <li class="tone-team"><b>Одобряем</b><span>Уходит письмо «доступ открыт»</span></li>
+            <li class="tone-open"><b>В продукте</b><span>Профиль сохранён, настраивать заново не нужно</span></li>
+          </ol>
+        </div>
+
+        <div class="lane">
+          <div class="lane-head">
+            <h3>3. Человек с лендинга</h3>
+            <span class="tag tone-wait">в лист ожидания</span>
+          </div>
+          <ol class="flow">
+            <li><b>«Стать тестером»</b><span>Кнопка на лендинге или прямая ссылка</span></li>
+            <li><b>Почта и код</b><span>Тот же вход</span></li>
+            <li><b>Имя, классы, предметы</b><span>Та же настройка</span></li>
+            <li><b>Телефон и «откуда узнали»</b><span>Источник спрашиваем, потому что сами его не знаем</span></li>
+            <li class="tone-wait"><b>Экран ожидания</b><span>Тот же</span></li>
+            <li class="tone-team"><b>Пишем и одобряем</b><span>Как у коллеги по ссылке</span></li>
+            <li class="tone-open"><b>В продукте</b><span>После одобрения</span></li>
+          </ol>
+        </div>
+
+        <div class="lane">
+          <div class="lane-head">
+            <h3>4. Тот, кто вернулся</h3>
+            <span class="tag tone-plain">по статусу</span>
+          </div>
+          <ol class="flow fork">
+            <li><b>Почта и код</b><span>Пароль не нужен</span></li>
+            <li class="tone-open"><b>Доступ открыт</b><span>Попадает в продукт туда, где остановился</span></li>
+            <li class="tone-wait"><b>Лист ожидания</b><span>Снова видит экран ожидания, а не пустую страницу</span></li>
+          </ol>
+        </div>
+        <div class="ids__space M"></div>
+      </div>
+
+      <!-- Экран ожидания -->
+      <div class="ids__wrapper">
+        <ids-nav-item id="waiting" label="Экран ожидания">
+          <h2>Что видит человек в листе ожидания</h2>
+        </ids-nav-item>
+        <div class="ids__sequence XL gap-L">
+          <div class="ids__sequence-item">
+            <div class="screen ids__rounded">
+              <h4>Вы в листе ожидания</h4>
+              <p>Мы открываем доступ постепенно. Напишем на почту, как только появится место.</p>
+              <div class="screen-field">+375 __ ___ __ __</div>
+              <div class="screen-field">Ник в Telegram, если хотите</div>
+              <p><small>☑ Согласен получать сообщения от Draft</small></p>
+              <p>А пока новости выходят здесь:</p>
+              <div class="screen-links"><span>Telegram</span><span>Viber</span></div>
+            </div>
+            <figure>
+              <figcaption>Набросок содержания, а не макет. Телефон заполняется один раз, дальше экран показывает только статус и ссылки.</figcaption>
+            </figure>
+          </div>
+          <div class="ids__sequence-item">
+            <ul>
+              <li><b>Это экран, а не попап.</b> Человек вернётся через неделю и должен увидеть то же самое.</li>
+              <li><b>Главное обещание про письмо.</b> Оно честное: при одобрении письмо уходит автоматически.</li>
+              <li><b>Каналы идут дополнением.</b> Показываем их, когда они заведены и в них есть что читать.</li>
+              <li><b>Телефон один на оба мессенджера.</b> Viber привязан к номеру, в Telegram человека обычно можно найти по номеру.</li>
+              <li><b>Сроков не называем.</b> Только «пригласим, когда появится место».</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ids__space L"></div>
+      </div>
+
+      <!-- Что делаем мы -->
+      <div class="ids__wrapper">
+        <ids-nav-item id="team" label="Что делаем мы">
+          <h2>Что делаем мы</h2>
+        </ids-nav-item>
+        <div class="lane">
+          <ol class="flow">
+            <li class="tone-team"><b>Зовём лично</b><span>Создаём приглашение, отправляем ссылку своими руками</span></li>
+            <li class="tone-team"><b>Смотрим лист ожидания</b><span>Имя, классы, предметы, телефон, кто привёл</span></li>
+            <li class="tone-team"><b>Пишем каждому</b><span>Через несколько дней после регистрации</span></li>
+            <li class="tone-team"><b>Записываем ответ</b><span>В общую таблицу, с пометкой «написали»</span></li>
+            <li class="tone-team"><b>Одобряем</b><span>Когда есть место; письмо уходит само</span></li>
+          </ol>
+        </div>
+        <div class="ids__text-width">
+          <h3>Сообщение человеку из листа ожидания</h3>
+          <blockquote>Здравствуйте, [имя]! Вы зарегистрировались в Draft и попали в лист ожидания. Мы открываем доступ постепенно и обязательно вас пригласим. Пока хочу спросить: что у вас отнимает больше всего времени при подготовке к урокам? Нам это поможет сделать сервис полезнее. Новости выходят здесь: [ссылка].</blockquote>
+          <ul>
+            <li>Пишем всем, а не только тем, кто не вступил в канал: подписчиков канала нельзя сопоставить с нашими аккаунтами.</li>
+            <li>Спрашиваем про трудности, а не «какие функции вы хотите». Из ответов складывается список того, что делать дальше.</li>
+            <li>«Как вы узнали о нас?» добавляем, только если человек пришёл не по ссылке коллеги и не ответил при регистрации.</li>
+            <li>Начинаем с того, что уже знаем: «вы ведёте математику в 5–7 классах».</li>
+            <li>Ничего не обещаем по функциям и срокам.</li>
+          </ul>
+        </div>
+        <div class="ids__space L"></div>
+      </div>
+
+      <!-- Что измеряем -->
+      <div class="ids__wrapper">
+        <ids-nav-item id="metrics" label="Что измеряем">
+          <h2>Как понять, рекомендуют ли нас</h2>
+        </ids-nav-item>
+        <div class="ids__sequence L gap-M stack">
+          <div class="ids__sequence-item">
+            <div class="card ids__rounded">
+              <h4>Сколько учителей привели коллегу</h4>
+              <p>Учителя, по чьей ссылке зарегистрировался хотя бы один человек. Главное число.</p>
+            </div>
+          </div>
+          <div class="ids__sequence-item">
+            <div class="card ids__rounded">
+              <h4>Копирования и открытия ссылки</h4>
+              <p>Показывают, где теряем: не делятся, или делятся, но коллеги не доходят до регистрации.</p>
+            </div>
+          </div>
+          <div class="ids__sequence-item">
+            <div class="card ids__rounded">
+              <h4>В продукте и в ожидании</h4>
+              <p>Сколько человек с доступом и сколько ждут. По этим двум числам решаем, кого звать следующим.</p>
+            </div>
+          </div>
+        </div>
+        <div class="ids__text-width">
+          <p>Эти счётчики уже собираются и видны в админке. Ответы на вопрос из сообщения в них не попадают, их ведём в таблице.</p>
+        </div>
+        <div class="ids__space L"></div>
+      </div>
+
+      <!-- Сделано и осталось -->
+      <div class="ids__wrapper">
+        <ids-nav-item id="todo" label="Сделано и осталось">
+          <h2>Что сделано и что осталось</h2>
+        </ids-nav-item>
+        <table>
+          <thead>
+            <tr>
+              <th>Что</th>
+              <th>Состояние</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Вход по коду из письма, личные приглашения, ссылки коллег</td>
+              <td><span class="tag tone-open">сделано</span></td>
+            </tr>
+            <tr>
+              <td>Лист ожидания с закрытым продуктом, одобрение с письмом</td>
+              <td><span class="tag tone-open">сделано</span></td>
+            </tr>
+            <tr>
+              <td>Счётчики рекомендаций в админке</td>
+              <td><span class="tag tone-open">сделано</span></td>
+            </tr>
+            <tr>
+              <td>Телефон с проверкой формата вместо свободного поля, ник в Telegram, галочка согласия</td>
+              <td><span class="tag tone-wait">добавить</span></td>
+            </tr>
+            <tr>
+              <td>Экран ожидания: обещание письма и ссылки на каналы</td>
+              <td><span class="tag tone-wait">добавить</span></td>
+            </tr>
+            <tr>
+              <td>Пометка «написали» в админке или общая таблица вместо неё</td>
+              <td><span class="tag tone-wait">добавить</span></td>
+            </tr>
+            <tr>
+              <td>Каналы в Telegram и Viber</td>
+              <td><span class="tag tone-team">завести нам</span></td>
+            </tr>
+            <tr>
+              <td>Формулировка согласия на обработку данных и сообщения</td>
+              <td><span class="tag tone-team">сверить с юристом</span></td>
+            </tr>
+            <tr>
+              <td>Проход всех четырёх путей на живом сервере с настоящей почтой</td>
+              <td><span class="tag tone-plain">не проверено</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="ids__space M"></div>
+
+        <div class="ids__sequence XL gap-L">
+          <div class="ids__sequence-item">
+            <h3>Решено</h3>
+            <ul>
+              <li>Приглашение одноразовое, но не привязано к почте: кто первым открыл, тот и вошёл.</li>
+              <li>Жёсткого лимита пользователей нет. Число держим тем, сколько приглашений выдали и скольких одобрили.</li>
+              <li>Коллеги по ссылке учителя в продукт сразу не попадают.</li>
+              <li>Контакт обязателен: он нужен, чтобы написать человеку позже.</li>
+            </ul>
+          </div>
+          <div class="ids__sequence-item">
+            <h3>Ждёт подтверждения</h3>
+            <ul>
+              <li>Единственный обязательный контакт — телефон, ник в Telegram по желанию.</li>
+              <li>Писать всем из листа ожидания, а не выбирать тех, кто не вступил в канал.</li>
+              <li>Через сколько дней после регистрации писать.</li>
+              <li>Регистрацию по паролю убрать после пилота.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ids__space XL"></div>
+      </div>
+    </main>
+
+    <footer>Draft · пилотный доступ · свёрстано на Intuition Design System</footer>
+
+    <script src="ids/js/footnotes.js"></script>
+    <script src="ids/js/navbar.js"></script>
+    <script src="ids/js/theme-toggle.js"></script>
+  </body>
+</html>
